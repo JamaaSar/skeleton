@@ -14,20 +14,14 @@ public class BidListService {
     public void delete(Integer id) {
         bidListRepository.deleteById(id);
     }
-    public void update(Integer id, BidList bidList) {
-        BidList update = bidListRepository.findById(id).orElseThrow();
 
-        bidListRepository.save(bidList);
-
-    }
     public List<BidList> getAll() {
         return bidListRepository.findAll();
     }
     public BidList get(Integer id) {
         return bidListRepository.findById(id).orElseThrow();
     }
-    public BidList add(BidList bid) {
-
-        return bidListRepository.save(bid);
+    public BidList save(BidList bidList) {
+        return bidListRepository.save(bidList);
     }
 }
