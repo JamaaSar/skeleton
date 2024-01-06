@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "trade")
 public class Trade {
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer tradeId;
     private String account;
     private String type;
