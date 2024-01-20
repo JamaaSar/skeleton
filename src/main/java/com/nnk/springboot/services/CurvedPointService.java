@@ -2,15 +2,13 @@ package com.nnk.springboot.services;
 
 import com.nnk.springboot.domain.BidList;
 import com.nnk.springboot.repositories.BidListRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class BidListService {
+public class CurvedPointService {
 
-    @Autowired
     private  BidListRepository bidListRepository;
 
     public void delete(Integer id) {
