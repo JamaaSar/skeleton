@@ -14,6 +14,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
@@ -32,60 +33,48 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Collection;
 
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration  {
+public class SecurityConfiguration {
 
     @Autowired
     private UserService userService;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        System.out.println(http);
-        return http  .sessionManagement(sessionManagement -> {
-            sessionManagement
-                    // Configures session creation policy
-                    .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-                    // Migrates session fixation issues
-                    .sessionFixation().migrateSession();
-        }).authorizeHttpRequests(auth -> {
+
+        return http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> {
                     auth.requestMatchers( "/", "app/login").permitAll();
-                    auth.requestMatchers("/user/**", "/app/secure/article-details").hasRole("ADMIN");
-                    auth.requestMatchers("/trade/**", "/ruleName/**","/rating/**","/curvePoint/**","/bidList/**").hasRole("USER");
+                    auth.requestMatchers("/user/**", "/app/secure/article-details").hasAuthority("ADMIN");
+                    auth.requestMatchers("/trade/**", "/ruleName/**","/rating/**","/curvePoint/**","/bidList/**").hasAuthority("USER");
                     auth.anyRequest().authenticated();
                 })
-            .formLogin(form -> form
-            .successHandler((request, response, authentication) -> {
-                    Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-                    if (authorities.contains(new SimpleGrantedAuthority("USER"))) {
-                        response.sendRedirect("/bidList/list");
-                    } else if (authorities.contains(new SimpleGrantedAuthority("ADMIN"))) {
-                        response.sendRedirect("/user/list");
-                    }
+                .formLogin(form -> form
+                    .successHandler((request, response, authentication) -> {
+                            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+                            if (authorities.contains(new SimpleGrantedAuthority("USER"))) {
+                                response.sendRedirect("/bidList/list");
+                            } else if (authorities.contains(new SimpleGrantedAuthority("ADMIN"))) {
+                                response.sendRedirect("/user/list");
+                            }
+                        })
+                    )
+                .logout((logout) -> logout
+                        .permitAll()
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/app-logout"))
+                )
+                .sessionManagement(sessionManagement -> { sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                        .sessionFixation().migrateSession();
                 })
-            )
-            .csrf(csrf -> csrf.disable()) .addFilterAfter((request, response, chain) -> {
-                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-                    chain.doFilter(request, response);
-                }, UsernamePasswordAuthenticationFilter.class).build();
-    }
-
-    @Bean
-    public UserDetailsService users() {
-        UserDetails user = User.builder()
-                .username("user")
-                .password(passwordEncoder().encode("user"))
-                .roles("USER").build();
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("USER", "ADMIN").build();
-        return new InMemoryUserDetailsManager(user, admin);
-    }
+               .build();
+        }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -96,7 +85,6 @@ public class SecurityConfiguration  {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         // Configuring user details service and password encoder
         authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
-        System.out.println(authenticationManagerBuilder);
         return authenticationManagerBuilder.build();
     }
 

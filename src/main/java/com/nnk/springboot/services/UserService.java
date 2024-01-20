@@ -24,17 +24,12 @@ public class UserService implements UserDetailsService {
             User user = userRepository.findByUsername(username);
             System.out.println("userload");
 
-            System.out.println(user);
-
-            return  new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getGrantedAuthorities(user.getRole()));
+            return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getGrantedAuthorities(user.getRole()));
         }
 
         private List<GrantedAuthority> getGrantedAuthorities(String role) {
             List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-            System.out.println(authorities);
             authorities.add(new SimpleGrantedAuthority(role));
-            System.out.println(authorities);
-
             return authorities;
         }
 }
