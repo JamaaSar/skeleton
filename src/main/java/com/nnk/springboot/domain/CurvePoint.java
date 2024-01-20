@@ -9,14 +9,21 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "curvepoint")
 public class CurvePoint {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "Id")
     private Integer id;
-    private Integer curveId; Timestamp asOfDate; Double term;
+    private Integer curveId;
+    Timestamp asOfDate;
+    Double term;
     private Double value;
     private Timestamp creationDate;
+    public CurvePoint(){
 
-    public CurvePoint(int curveId, double terme, double value) {
+    }
+    public CurvePoint(int curveId, double term, double value) {
+       this.curveId = curveId;
+       this.term = term;
+       this.value = value;
     }
 
     public Integer getId() {
