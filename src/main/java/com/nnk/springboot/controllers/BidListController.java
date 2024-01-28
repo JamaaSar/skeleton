@@ -26,11 +26,8 @@ public class BidListController {
     public String home(Model model)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         List<BidList> bidlists = bidListService.getAll();
-        if(bidlists.isEmpty()){
-            return "error";
-        }
+
         model.addAttribute("remoteUser", authentication.getName());
         model.addAttribute("bidLists", bidlists);
         return "bidList/list";
@@ -38,6 +35,7 @@ public class BidListController {
 
     @GetMapping("/bidList/add")
     public String addBidForm(BidList bid) {
+
         return "bidList/add";
     }
 
@@ -55,7 +53,7 @@ public class BidListController {
 
     @GetMapping("/bidList/update/{id}")
     public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-        model.addAttribute("bidLists", bidListService.get(id));
+        model.addAttribute("bidList", bidListService.get(id));
         return "bidList/update";
     }
 
@@ -63,6 +61,7 @@ public class BidListController {
     public String updateBid(@PathVariable("id") Integer id, @Valid BidList bidList,
                              BindingResult result, Model model) {
         if (result.hasErrors()) {
+            model.addAttribute("bidList", bidListService.get(id));
             return "bidList/update";
         }
         bidList.setBidListId(id);

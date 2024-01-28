@@ -9,7 +9,8 @@ import java.sql.Timestamp;
 @Table(name = "trade")
 public class Trade {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "TradeId")
     private Integer tradeId;
     private String account;
     private String type;
@@ -32,7 +33,10 @@ public class Trade {
     private String sourceListId;
     private String side;
 
-    public Trade(String tradeAccount, String type) {
+    public Trade(){}
+    public Trade(String account, String type) {
+        this.account = account;
+        this.type = type;
     }
 
     public Integer getTradeId() {
