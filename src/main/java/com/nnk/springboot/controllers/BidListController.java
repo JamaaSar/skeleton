@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.BidList;
+import com.nnk.springboot.dto.CurrentUserDTO;
 import com.nnk.springboot.services.BidListService;
 import com.nnk.springboot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,11 @@ public class BidListController {
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         List<BidList> bidlists = bidListService.getAll();
-        System.out.println(authentication.getAuthorities());
-        System.out.println(authentication.getAuthorities());
-        boolean isAdmin = userService.isAdmin(
-                (List<GrantedAuthority>) authentication.getAuthorities());
-        model.addAttribute("isAdmin", isAdmin);
-        model.addAttribute("remoteUser", authentication.getName());
+
+        CurrentUserDTO currentUserDTO = userService.getCurrentUser(authentication);
+        model.addAttribute("isAdmin", currentUserDTO.getIsAdmin());
+        model.addAttribute("remoteUser", currentUserDTO.getUsername());
+
         model.addAttribute("bidLists", bidlists);
         return "bidList/list";
     }

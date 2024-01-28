@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Rating;
+import com.nnk.springboot.dto.CurrentUserDTO;
 import com.nnk.springboot.services.RatingService;
 import com.nnk.springboot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,9 @@ public class RatingController {
     {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = userService.isAdmin(
-                (List<GrantedAuthority>) authentication.getAuthorities());
-        model.addAttribute("isAdmin", isAdmin);
-        model.addAttribute("remoteUser", authentication.getName());
+        CurrentUserDTO currentUserDTO = userService.getCurrentUser(authentication);
+        model.addAttribute("isAdmin", currentUserDTO.getIsAdmin());
+        model.addAttribute("remoteUser", currentUserDTO.getUsername());
         model.addAttribute("ratings", ratingService.getAll());
         return "rating/list";
     }

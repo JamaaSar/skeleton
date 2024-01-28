@@ -1,7 +1,9 @@
 package com.nnk.springboot.controllers;
 
+import com.nnk.springboot.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,13 +19,16 @@ import org.springframework.web.servlet.ModelAndView;
 public class HomeController
 {
 	SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+	@Autowired
+	private UserService userService;
 
 	@RequestMapping("/")
 	public String home(Model model)
 	{
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().
-				getAuthentication().getPrincipal();
-		if(userDetails != null ){
+		Authentication authentication = SecurityContextHolder.getContext().
+				getAuthentication();
+		if(authentication.getPrincipal() != null ){
+			userService.creatUserFromOauth2(authentication);
 			return "redirect:/bidList/list";
 		}
 		return "/login";

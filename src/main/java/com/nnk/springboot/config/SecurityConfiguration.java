@@ -61,7 +61,8 @@ public class SecurityConfiguration {
                     auth.requestMatchers( "/").permitAll();
                     auth.requestMatchers("/user/**").hasAuthority("ADMIN");
                     auth.requestMatchers("/trade/**", "/ruleName/**","/rating/**",
-                            "/curvePoint/**","/bidList/**").hasAnyAuthority("USER", "ADMIN");
+                            "/curvePoint/**","/bidList/**").hasAnyAuthority("USER",
+                            "ADMIN","OAUTH2_USER");
                     auth.anyRequest().authenticated();
                 })
                 .formLogin(form -> form

@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.dto.CurrentUserDTO;
 import com.nnk.springboot.repositories.UserRepository;
 import com.nnk.springboot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,9 @@ public class UserController {
     public String home(Model model)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = userService.isAdmin(
-                (List<GrantedAuthority>) authentication.getAuthorities());
-        model.addAttribute("isAdmin", isAdmin);
-        model.addAttribute("remoteUser", authentication.getName());
+        CurrentUserDTO currentUserDTO = userService.getCurrentUser(authentication);
+        model.addAttribute("isAdmin", currentUserDTO.getIsAdmin());
+        model.addAttribute("remoteUser", currentUserDTO.getUsername());
         model.addAttribute("users", userRepository.findAll());
         return "user/list";
     }

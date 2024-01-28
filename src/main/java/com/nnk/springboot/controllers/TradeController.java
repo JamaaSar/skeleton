@@ -1,6 +1,7 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Trade;
+import com.nnk.springboot.dto.CurrentUserDTO;
 import com.nnk.springboot.services.TradeService;
 import com.nnk.springboot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,9 @@ public class TradeController {
     public String home(Model model)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = userService.isAdmin(
-                (List<GrantedAuthority>) authentication.getAuthorities());
-        model.addAttribute("isAdmin", isAdmin);
-        model.addAttribute("remoteUser", authentication.getName());
+        CurrentUserDTO currentUserDTO = userService.getCurrentUser(authentication);
+        model.addAttribute("isAdmin", currentUserDTO.getIsAdmin());
+        model.addAttribute("remoteUser", currentUserDTO.getUsername());
         model.addAttribute("trades", tradeService.getAll());
         return "trade/list";
     }
