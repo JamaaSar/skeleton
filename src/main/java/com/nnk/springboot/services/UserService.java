@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.nnk.springboot.domain.User;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 @Service
@@ -31,5 +32,15 @@ public class UserService implements UserDetailsService {
             List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
             authorities.add(new SimpleGrantedAuthority(role));
             return authorities;
+        }
+        public boolean isAdmin(List<GrantedAuthority> authorities)
+        {
+            for (GrantedAuthority authority : authorities) {
+                if(authority.getAuthority().equals("ADMIN")){
+                    return true;
+                }
+            }
+            return false;
+
         }
 }

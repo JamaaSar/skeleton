@@ -2,8 +2,10 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.BidList;
 import com.nnk.springboot.services.BidListService;
+import com.nnk.springboot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,13 +23,19 @@ import java.util.List;
 public class BidListController {
     @Autowired
     private BidListService bidListService;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping("/bidList/list")
     public String home(Model model)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         List<BidList> bidlists = bidListService.getAll();
-
+        System.out.println(authentication.getAuthorities());
+        System.out.println(authentication.getAuthorities());
+        boolean isAdmin = userService.isAdmin(
+                (List<GrantedAuthority>) authentication.getAuthorities());
+        model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("remoteUser", authentication.getName());
         model.addAttribute("bidLists", bidlists);
         return "bidList/list";
