@@ -2,8 +2,10 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.CurvePoint;
 import com.nnk.springboot.services.CurvePointService;
+import com.nnk.springboot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,15 +17,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 @Controller
 public class CurveController {
 
     @Autowired
     private CurvePointService curvePointService;
+    @Autowired
+    private UserService userService;
     @RequestMapping("/curvePoint/list")
     public String home(Model model)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = userService.isAdmin(
+                (List<GrantedAuthority>) authentication.getAuthorities());
+        model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("remoteUser", authentication.getName());
         model.addAttribute("curvePoints", curvePointService.getAll());
         return "curvePoint/list";
@@ -46,7 +55,6 @@ public class CurveController {
             return "redirect:/curvePoint/list";
         }
 
-        // TODO: check data valid and save to db, after saving return Curve list
         return "curvePoint/add";
     }
 

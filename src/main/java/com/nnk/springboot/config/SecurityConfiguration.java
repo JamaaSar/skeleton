@@ -1,5 +1,6 @@
 package com.nnk.springboot.config;
 
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nnk.springboot.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,7 +28,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFilter;
@@ -35,6 +40,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.util.Collection;
 
 
@@ -44,31 +50,26 @@ public class SecurityConfiguration {
 
     @Autowired
     private UserService userService;
+    private String jwtKey = "toupdate.....";
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers( "/", "app/login").permitAll();
-                    auth.requestMatchers("/user/**", "/app/secure/article-details").hasAuthority("ADMIN");
-                    auth.requestMatchers("/trade/**", "/ruleName/**","/rating/**","/curvePoint/**","/bidList/**").hasAuthority("USER");
+                    auth.requestMatchers( "/").permitAll();
+                    auth.requestMatchers("/user/**").hasAuthority("ADMIN");
+                    auth.requestMatchers("/trade/**", "/ruleName/**","/rating/**",
+                            "/curvePoint/**","/bidList/**").hasAnyAuthority("USER", "ADMIN");
                     auth.anyRequest().authenticated();
                 })
                 .formLogin(form -> form
                     .successHandler((request, response, authentication) -> {
-                            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-                            if (authorities.contains(new SimpleGrantedAuthority("USER"))) {
                                 response.sendRedirect("/bidList/list");
-                            } else if (authorities.contains(new SimpleGrantedAuthority("ADMIN"))) {
-                                response.sendRedirect("/user/list");
-                            }
                         })
                     )
-                .logout((logout) -> logout
-                        .permitAll()
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/app-logout"))
-                )
+                .oauth2Login(Customizer.withDefaults())
                 .sessionManagement(sessionManagement -> { sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                         .sessionFixation().migrateSession();
