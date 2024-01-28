@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "bidlist")
 public class BidList {
+    @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "BidListId")
     private Integer BidListId;

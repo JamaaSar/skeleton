@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "curvepoint")
 public class CurvePoint {
+    @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "Id")
     private Integer id;

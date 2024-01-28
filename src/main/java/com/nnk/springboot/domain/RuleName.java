@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "rulename")
 public class RuleName {
+    @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "Id")
     private Integer id;
