@@ -67,7 +67,7 @@ public class RuleNameController {
                              BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("ruleName", ruleNameService.get(id));
-            return "curvePoint/update";
+            return "ruleName/update";
         }
         ruleName.setId(id);
         ruleNameService.save(ruleName);
