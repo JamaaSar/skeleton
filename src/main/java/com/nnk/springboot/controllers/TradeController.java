@@ -40,7 +40,7 @@ public class TradeController {
     }
 
     @GetMapping("/trade/add")
-    public String addUser(Trade bid) {
+    public String addUser(Trade trade) {
         return "trade/add";
     }
 
@@ -66,7 +66,7 @@ public class TradeController {
                              BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("trade", tradeService.get(id));
-            return "curvePoint/update";
+            return "trade/update";
         }
         trade.setTradeId(id);
         tradeService.save(trade);
